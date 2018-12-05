@@ -9,15 +9,15 @@
 
 using namespace sf;
 
-class Ship
+class Bullet
 {
 public:
-	float speed = 500;
+	float speed = 600;
 	float rot = 0;
-	Vector2f size = Vector2f(40, 60);
-	Vector2f pos = Vector2f(600 - 20, 450 - 30);
+	Vector2f size = Vector2f(5, 10);
+	Vector2f pos;
 	Vector2f vel = Vector2f(0, 0);
 
-	RectangleShape DrawShip(Texture&, float, float, float);
+	RectangleShape DrawBullet();
 };
 
