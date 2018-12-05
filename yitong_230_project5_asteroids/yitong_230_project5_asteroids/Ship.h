@@ -18,6 +18,7 @@ public:
 	Vector2f pos = Vector2f(600 - 20, 450 - 30);
 	Vector2f vel = Vector2f(0, 0);
 
-	RectangleShape DrawShip(Texture&);
+	RectangleShape DrawShip(Texture&, float, float, float);
+	void SpeedUp(float, RectangleShape);
 };
 
