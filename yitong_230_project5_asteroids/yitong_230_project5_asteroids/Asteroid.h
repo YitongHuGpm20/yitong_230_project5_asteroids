@@ -9,15 +9,15 @@
 
 using namespace sf;
 
-class Bullet
+class Asteroid
 {
 public:
-	float speed = 600;
-	float rot = 0;
-	Vector2f size = Vector2f(5, 10);
-	Vector2f pos = Vector2f(-100, -100);
-	Vector2f vel = Vector2f(0, 0);
+	Vector2f pos;
+	Vector2f vel;
+	float radius = 70;
+	float speed = 50;
+	float rot;
 
-	RectangleShape DrawBullet();
+	CircleShape DrawAst(Texture&);
 };
 

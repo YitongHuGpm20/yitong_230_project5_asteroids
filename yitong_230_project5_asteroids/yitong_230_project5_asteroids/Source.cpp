@@ -7,6 +7,7 @@
 #include <SFML/Main.hpp>
 #include "Ship.h"
 #include "Bullet.h"
+#include "Asteroid.h"
 #include <ctime>
 
 using namespace sf;
@@ -32,12 +33,15 @@ Sound sou_ship;
 Bullet bullet[100];
 SoundBuffer buf_bullet;
 Sound sou_bullet;
+Asteroid asteroid[10];
+Texture tex_ast;
 float green = 255;
 float red = 200;
 float blue = 0;
 bool play_sou_ship = false;
 int bulletNum = 0;
 int count = 300;
+int level = 1;
 
 int main()
 {
@@ -49,6 +53,19 @@ int main()
 	sou_ship.setVolume(50);
 	buf_bullet.loadFromFile("bullet.wav");
 	sou_bullet.setBuffer(buf_bullet);
+	tex_ast.loadFromFile("asteroid.png");
+	srand(time(0));
+
+	//setup asteroids
+	for (int i = 0; i < 4; i++) {
+		float angle = rand() % 360;
+		asteroid[i].vel.x = cos((angle * 3.1415926f) / 180);
+		asteroid[i].vel.y = sin((angle * 3.1415926f) / 180);
+		do {
+			asteroid[i].pos.x = rand() % 1000 + 100;
+			asteroid[i].pos.y = rand() % 800 + 50;
+		} while ((asteroid[i].pos.x >= 550 && asteroid[i].pos.x <= 650) || (asteroid[i].pos.y >= 400 && asteroid[i].pos.y <= 500));
+	}
 
 	while (window.isOpen())
 	{
@@ -134,12 +151,27 @@ void update_state(float dt)
 		if (bullet[i].pos.y >= window.getSize().y + bullet[i].size.y)
 			bullet[i].pos.y = 0;
 	}
+	for (int i = 0; i < 4; i++) {
+		if (asteroid[i].pos.x <= -asteroid[i].radius * 2)
+			asteroid[i].pos.x = window.getSize().x;
+		if (asteroid[i].pos.x >= window.getSize().x + asteroid[i].radius * 2)
+			asteroid[i].pos.x = 0;
+		if (asteroid[i].pos.y <= -asteroid[i].radius * 2)
+			asteroid[i].pos.y = window.getSize().y;
+		if (asteroid[i].pos.y >= window.getSize().y + asteroid[i].radius * 2)
+			asteroid[i].pos.y = 0;
+	}
 
+	//update positions of objects
 	ship.pos.x += ship.vel.x * dt * ship.speed;
 	ship.pos.y += ship.vel.y * dt * ship.speed;
 	for (int i = 0; i < 100; i++) {
 		bullet[i].pos.x += bullet[i].vel.x * dt * bullet[i].speed * 300;
 		bullet[i].pos.y += bullet[i].vel.y * dt * bullet[i].speed * 300;
+	}
+	for (int i = 0; i < 4; i++) {
+		asteroid[i].pos.x += asteroid[i].vel.x * dt * asteroid[i].speed;
+		asteroid[i].pos.y += asteroid[i].vel.y * dt * asteroid[i].speed;
 	}
 }
 
@@ -149,4 +181,6 @@ void render_frame()
 	window.draw(ship.DrawShip(tex_ship, red, green, blue));
 	for (int i = 0; i < 100; i++)
 		window.draw(bullet[i].DrawBullet());
+	for (int i = 0; i < 4; i++)
+		window.draw(asteroid[i].DrawAst(tex_ast));
 }
