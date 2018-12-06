@@ -1,10 +1,49 @@
 #include "Bullet.h"
 
-RectangleShape Bullet::DrawBullet() {
+extern Ship* s;
+extern RenderWindow window;
+
+void Bullet::update(float dt)
+{
+	if (pos.x <= -size.x)
+		pos.x = window.getSize().x;
+	if (pos.x >= window.getSize().x + size.x)
+		pos.x = 0;
+	if (pos.y <= -size.y)
+		pos.y = window.getSize().y;
+	if (pos.y >= window.getSize().y + size.y)
+		pos.y = 0;
+	pos.x += vel.x * dt * speed * 300;
+	pos.y += vel.y * dt * speed * 300;
+}
+
+void Bullet::draw()
+{
 	RectangleShape shape;
 	shape.setPosition(pos);
 	shape.setSize(size);
 	shape.setRotation(rot);
 	shape.setFillColor(Color::Yellow);
-	return shape;
+	shape.setOrigin(size.x / 2, size.y / 2);
+	window.draw(shape);
+}
+
+Vector2f Bullet::getCenter()
+{
+	return pos;
+}
+
+void Bullet::checkCollisionWith(GameObject * obj)
+{
+
+}
+
+string Bullet::getName()
+{
+	return "bullet";
+}
+
+float Bullet::getRadius()
+{
+	return 2.5f;
 }

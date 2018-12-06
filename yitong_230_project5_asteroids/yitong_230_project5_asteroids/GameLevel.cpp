@@ -1,27 +1,16 @@
 #include "GameLevel.h"
 
-template<typename T>
-T lerp(T start, T end, float t) {
-	return start + (end - start) * t;
-}
-template<typename T>
-T easeOut(T start, T end, float t) {
-	--t;
-	return start + (end - start) * (t * t * t + 1);
-}
-
 extern RenderWindow window;
 
-
-
+Ship* s = new Ship();
 
 GameLevel::GameLevel(int level) {
-	tex_ship.loadFromFile("spaceship.png");
-	buf_ship.loadFromFile("launch.wav");
-	sou_ship.setBuffer(buf_ship);
-	sou_ship.setVolume(50);
-	buf_bullet.loadFromFile("bullet.wav");
-	sou_bullet.setBuffer(buf_bullet);
+	//setup ship
+	s->tex.loadFromFile("spaceship.png");
+	s->buf.loadFromFile("launch.wav");
+	s->sou.setBuffer(s->buf);
+	s->sou.setVolume(50);
+	addGameObject(s);
 
 	//setup asteroids
 	for (int i = 0; i < 4; i++) {
@@ -102,7 +91,8 @@ AppState* GameLevel::update_state(float dt) {
 		}
 		detect_collisions(obj, newBucket);
 	}
-		
+
+	//switch scenes
 	//if (lives <= 0)
 		//return new GameOverScreen();
 	if (enemiesRemaining <= 0)
@@ -110,83 +100,21 @@ AppState* GameLevel::update_state(float dt) {
 	if (Keyboard::isKeyPressed(Keyboard::Escape))
 		return new MainMenu();
 
-	//player control
-	if (Keyboard::isKeyPressed(Keyboard::Left)) {
-		ship.rot += -0.5f;
-	}
-	if (Keyboard::isKeyPressed(Keyboard::Right)) {
-		ship.rot += 0.5f;
-	}
-	if (Keyboard::isKeyPressed(Keyboard::Up)) {
-		ship.vel.x += cos(((ship.rot - 90) * 3.1415926f) / 180) * dt;
-		ship.vel.y += sin(((ship.rot - 90) * 3.1415926f) / 180) * dt;
-		red = 255;
-		blue = 255;
-		if (sou_ship.getStatus() != Sound::Playing) {
-			sou_ship.play();
-		}
-	}
-	if (Keyboard::isKeyPressed(Keyboard::Down)) {
-		ship.vel.x -= cos(((ship.rot - 90) * 3.1415926f) / 180) * dt;
-		ship.vel.y -= sin(((ship.rot - 90) * 3.1415926f) / 180) * dt;
-		red = 255;
-		blue = 255;
-		if (sou_ship.getStatus() != Sound::Playing) {
-			sou_ship.play();
-		}
-	}
 	if (Keyboard::isKeyPressed(Keyboard::Space)) {
-		if (count == 300 && bulletNum < 100) {
-			bullet[bulletNum].pos = ship.pos;
-			bullet[bulletNum].vel.x += cos(((ship.rot - 90) * 3.1415926f) / 180) * dt;
-			bullet[bulletNum].vel.y += sin(((ship.rot - 90) * 3.1415926f) / 180) * dt;
-			bullet[bulletNum].rot = ship.rot;
-			bulletNum++;
-			count = 0;
-			sou_bullet.play();
+		if (s->count == 300) {
+			Bullet* b = new Bullet();
+			b->buf.loadFromFile("bullet.wav");
+			b->sou.setBuffer(b->buf);
+			b->sou.setVolume(20);
+			b->pos = s->pos;
+			b->rot = s->rot;
+			b->vel.x += cos(((s->rot - 90) * 3.1415926f) / 180) * dt;
+			b->vel.y += sin(((s->rot - 90) * 3.1415926f) / 180) * dt;
+			s->count = 0;
+			b->sou.play();
+			addGameObject(b);
 		}
 	}
-
-	//slow down
-	ship.vel.x = lerp(ship.vel.x, 0.f, dt);
-	ship.vel.y = lerp(ship.vel.y, 0.f, dt);
-
-	//speed up
-	red = easeOut(red, 200.f, dt);
-	blue = easeOut(blue, 0.f, dt);
-
-	//wrap around map
-	if (ship.pos.x <= -ship.size.x)
-		ship.pos.x = window.getSize().x;
-	if (ship.pos.x >= window.getSize().x + ship.size.x)
-		ship.pos.x = 0;
-	if (ship.pos.y <= -ship.size.y)
-		ship.pos.y = window.getSize().y;
-	if (ship.pos.y >= window.getSize().y + ship.size.y)
-		ship.pos.y = 0;
-	for (int i = 0; i < 100; i++) {
-		if (bullet[i].pos.x <= -bullet[i].size.x)
-			bullet[i].pos.x = window.getSize().x;
-		if (bullet[i].pos.x >= window.getSize().x + bullet[i].size.x)
-			bullet[i].pos.x = 0;
-		if (bullet[i].pos.y <= -bullet[i].size.y)
-			bullet[i].pos.y = window.getSize().y;
-		if (bullet[i].pos.y >= window.getSize().y + bullet[i].size.y)
-			bullet[i].pos.y = 0;
-	}
-	
-
-	//update positions of objects
-	ship.pos.x += ship.vel.x * dt * ship.speed;
-	ship.pos.y += ship.vel.y * dt * ship.speed;
-	for (int i = 0; i < 100; i++) {
-		bullet[i].pos.x += bullet[i].vel.x * dt * bullet[i].speed * 300;
-		bullet[i].pos.y += bullet[i].vel.y * dt * bullet[i].speed * 300;
-	}
-	
-
-	if (count < 300)
-		count++;
 
 	return nullptr;
 }
@@ -194,8 +122,4 @@ AppState* GameLevel::update_state(float dt) {
 void GameLevel::render_frame() {
 	for (int i = 0; i < objects.size(); ++i)
 		objects[i]->draw();
-	
-	window.draw(ship.DrawShip(tex_ship, red, green, blue));
-	for (int i = 0; i < 100; i++)
-		window.draw(bullet[i].DrawBullet());
 }

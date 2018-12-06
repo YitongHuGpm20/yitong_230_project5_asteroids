@@ -4,16 +4,16 @@ extern RenderWindow window;
 
 void Asteroid::update(float dt)
 {
-		if (pos.x <= -radius * 2)
-			pos.x = window.getSize().x;
-		if (pos.x >= window.getSize().x + radius * 2)
-			pos.x = 0;
-		if (pos.y <= -radius * 2)
-			pos.y = window.getSize().y;
-		if (pos.y >= window.getSize().y + radius * 2)
-			pos.y = 0;
-		pos.x += vel.x * dt * speed;
-		pos.y += vel.y * dt * speed;
+	if (pos.x <= -radius * 2)
+		pos.x = window.getSize().x;
+	if (pos.x >= window.getSize().x + radius * 2)
+		pos.x = 0;
+	if (pos.y <= -radius * 2)
+		pos.y = window.getSize().y;
+	if (pos.y >= window.getSize().y + radius * 2)
+		pos.y = 0;
+	pos.x += vel.x * dt * speed;
+	pos.y += vel.y * dt * speed;
 }
 
 void Asteroid::draw()
@@ -34,7 +34,7 @@ Vector2f Asteroid::getCenter()
 
 void Asteroid::checkCollisionWith(GameObject * obj)
 {
-	
+	//check collid with bullets
 }
 
 string Asteroid::getName()
