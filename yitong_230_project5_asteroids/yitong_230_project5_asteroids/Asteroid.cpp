@@ -1,20 +1,48 @@
 #include "Asteroid.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
-#include <SFML/System.hpp>
-#include <SFML/OpenGL.hpp>
-#include <SFML/Main.hpp>
 
-using namespace sf;
+extern RenderWindow window;
 
-CircleShape Asteroid::DrawAst(Texture &stone) {
+void Asteroid::update(float dt)
+{
+		if (pos.x <= -radius * 2)
+			pos.x = window.getSize().x;
+		if (pos.x >= window.getSize().x + radius * 2)
+			pos.x = 0;
+		if (pos.y <= -radius * 2)
+			pos.y = window.getSize().y;
+		if (pos.y >= window.getSize().y + radius * 2)
+			pos.y = 0;
+		pos.x += vel.x * dt * speed;
+		pos.y += vel.y * dt * speed;
+}
+
+void Asteroid::draw()
+{
 	CircleShape shape;
 	shape.setPosition(pos);
 	shape.setRadius(radius);
-	shape.setTexture(&stone);
+	shape.setTexture(&tex);
 	shape.setOrigin(radius / 2, radius / 2);
 	shape.setRotation(rot);
-	return shape;
+	window.draw(shape);
+}
+
+Vector2f Asteroid::getCenter()
+{
+	return pos;
+}
+
+void Asteroid::checkCollisionWith(GameObject * obj)
+{
+	
+}
+
+string Asteroid::getName()
+{
+	return "asteroid";
+}
+
+float Asteroid::getRadius()
+{
+	return radius;
 }

@@ -18,12 +18,14 @@
 
 using namespace sf;
 using namespace std;
-
+const float BUCKET_WIDTH = 120;
+const float BUCKET_HEIGHT = 90;
+const int COLUMNS = 10;
+const int ROWS = 10;
 class GameLevel : public AppState
 {
 private:
 	int level;
-	vector<unique_ptr<GameObject>> objs;
 	int lives;
 	int enemiesRemaining = 4 + level - 1;
 	Ship ship;
@@ -41,9 +43,16 @@ private:
 	bool play_sou_ship = false;
 	int bulletNum = 0;
 	int count = 300;
+	vector<GameObject*> objects;
+	vector<GameObject*> grid[COLUMNS][ROWS];
+	
 public:
 	GameLevel(int level);
 	virtual AppState* update_state(float dt);
 	virtual void render_frame();
+	void addGameObject(GameObject* obj);
+	void bucket_add(Vector2i b, GameObject* obj);
+	void bucket_remove(Vector2i b, GameObject* obj);
+	void detect_collisions(GameObject* obj, Vector2i b);
 };
 

@@ -6,10 +6,11 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
+#include "GameObject.h"
 
 using namespace sf;
 
-class Ship
+class Ship : public GameObject
 {
 public:
 	float speed = 500;

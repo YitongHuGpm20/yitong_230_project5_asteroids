@@ -12,32 +12,97 @@ T easeOut(T start, T end, float t) {
 
 extern RenderWindow window;
 
-GameLevel::GameLevel(int level)
-{
+
+
+
+GameLevel::GameLevel(int level) {
 	tex_ship.loadFromFile("spaceship.png");
 	buf_ship.loadFromFile("launch.wav");
 	sou_ship.setBuffer(buf_ship);
 	sou_ship.setVolume(50);
 	buf_bullet.loadFromFile("bullet.wav");
 	sou_bullet.setBuffer(buf_bullet);
-	tex_ast.loadFromFile("asteroid.png");
 
 	//setup asteroids
 	for (int i = 0; i < 4; i++) {
+		Asteroid* a = new Asteroid();
+		a->tex.loadFromFile("asteroid.png");
 		float angle = rand() % 360;
-		asteroid[i].vel.x = cos((angle * 3.1415926f) / 180);
-		asteroid[i].vel.y = sin((angle * 3.1415926f) / 180);
+		a->vel.x = cos((angle * 3.1415926f) / 180);
+		a->vel.y = sin((angle * 3.1415926f) / 180);
 		do {
-			asteroid[i].pos.x = rand() % 1000 + 100;
-			asteroid[i].pos.y = rand() % 800 + 50;
-		} while ((asteroid[i].pos.x >= 550 && asteroid[i].pos.x <= 650) || (asteroid[i].pos.y >= 400 && asteroid[i].pos.y <= 500));
+			a->pos.x = rand() % 1000 + 100;
+			a->pos.y = rand() % 800 + 50;
+		} while ((a->pos.x >= 550 && a->pos.x <= 650) || (a->pos.y >= 400 && a->pos.y <= 500));
+		addGameObject(a);
 	}
 }
 
-AppState* GameLevel::update_state(float dt)
-{	
-	for (int i = 0; i < objs.size(); ++i)
-		objs[i]->update(dt);
+Vector2i getBucket(Vector2f pos) {
+	int col = int(pos.x / BUCKET_WIDTH);
+	if (col < 0)
+		col = 0;
+	else if (col >= COLUMNS)
+		col = COLUMNS - 1;
+	int row = int(pos.y / BUCKET_HEIGHT);
+	if (row < 0)
+		row = 0;
+	else if (row >= ROWS)
+		row = ROWS - 1;
+	return Vector2i(col, row);
+}
+
+void GameLevel::bucket_add(Vector2i b, GameObject* obj) {
+	vector<GameObject*>& v = grid[b.x][b.y];
+	v.push_back(obj);
+}
+
+void GameLevel::bucket_remove(Vector2i b, GameObject* obj) {
+	vector<GameObject*>& v = grid[b.x][b.y];
+	for (int i = 0; i < v.size(); ++i) {
+		if (v[i] == obj) {
+			v.erase(v.begin() + i);
+			break;
+		}
+	}
+}
+
+void GameLevel::detect_collisions(GameObject* obj, Vector2i b) {
+	int left = max(b.x - 1, 0);
+	int right = min(b.x + 1, COLUMNS - 1);
+	int top = max(b.y - 1, 0);
+	int bot = min(b.y + 1, ROWS - 1);
+	for (int bx = left; bx <= right; ++bx) {
+		for (int by = top; by <= bot; ++by) {
+			vector<GameObject*> & v = grid[bx][by];
+			for (GameObject* o : v) {
+				if (o != obj)
+					obj->checkCollisionWith(o);
+			}
+		}
+	}
+}
+
+void GameLevel::addGameObject(GameObject* obj)
+{
+	objects.push_back(obj);
+	bucket_add(getBucket(obj->getCenter()), obj);
+}
+
+AppState* GameLevel::update_state(float dt) {	
+	//Bucket Grid
+	for (int i = 0; i < objects.size(); ++i) {
+		GameObject * obj = objects[i];
+		Vector2i curBucket = getBucket(obj->getCenter());
+		obj->update(dt);
+		Vector2i newBucket = getBucket(obj->getCenter());
+		if (curBucket != newBucket) {
+			bucket_remove(curBucket, obj);
+			bucket_add(newBucket, obj);
+		}
+		detect_collisions(obj, newBucket);
+	}
+		
 	//if (lives <= 0)
 		//return new GameOverScreen();
 	if (enemiesRemaining <= 0)
@@ -109,16 +174,7 @@ AppState* GameLevel::update_state(float dt)
 		if (bullet[i].pos.y >= window.getSize().y + bullet[i].size.y)
 			bullet[i].pos.y = 0;
 	}
-	for (int i = 0; i < 4; i++) {
-		if (asteroid[i].pos.x <= -asteroid[i].radius * 2)
-			asteroid[i].pos.x = window.getSize().x;
-		if (asteroid[i].pos.x >= window.getSize().x + asteroid[i].radius * 2)
-			asteroid[i].pos.x = 0;
-		if (asteroid[i].pos.y <= -asteroid[i].radius * 2)
-			asteroid[i].pos.y = window.getSize().y;
-		if (asteroid[i].pos.y >= window.getSize().y + asteroid[i].radius * 2)
-			asteroid[i].pos.y = 0;
-	}
+	
 
 	//update positions of objects
 	ship.pos.x += ship.vel.x * dt * ship.speed;
@@ -127,10 +183,7 @@ AppState* GameLevel::update_state(float dt)
 		bullet[i].pos.x += bullet[i].vel.x * dt * bullet[i].speed * 300;
 		bullet[i].pos.y += bullet[i].vel.y * dt * bullet[i].speed * 300;
 	}
-	for (int i = 0; i < 4; i++) {
-		asteroid[i].pos.x += asteroid[i].vel.x * dt * asteroid[i].speed;
-		asteroid[i].pos.y += asteroid[i].vel.y * dt * asteroid[i].speed;
-	}
+	
 
 	if (count < 300)
 		count++;
@@ -138,14 +191,11 @@ AppState* GameLevel::update_state(float dt)
 	return nullptr;
 }
 
-void GameLevel::render_frame()
-{
-	for (int i = 0; i < objs.size(); ++i)
-		objs[i]->draw();
+void GameLevel::render_frame() {
+	for (int i = 0; i < objects.size(); ++i)
+		objects[i]->draw();
 	
 	window.draw(ship.DrawShip(tex_ship, red, green, blue));
 	for (int i = 0; i < 100; i++)
 		window.draw(bullet[i].DrawBullet());
-	for (int i = 0; i < 4; i++)
-		window.draw(asteroid[i].DrawAst(tex_ast));
 }

@@ -6,10 +6,11 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
+#include "GameObject.h"
 
 using namespace sf;
 
-class Asteroid
+class Asteroid : public GameObject
 {
 public:
 	Vector2f pos;
@@ -17,7 +18,13 @@ public:
 	float radius = 70;
 	float speed = 50;
 	float rot;
+	Texture tex;
 
-	CircleShape DrawAst(Texture&);
+	virtual void update(float dt);
+	virtual void draw();
+	virtual Vector2f getCenter();
+	virtual void checkCollisionWith(GameObject * obj);
+	virtual string getName();
+	virtual float getRadius();
 };
 

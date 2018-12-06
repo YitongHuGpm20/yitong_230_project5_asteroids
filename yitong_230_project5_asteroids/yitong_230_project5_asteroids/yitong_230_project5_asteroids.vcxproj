@@ -149,11 +149,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AppState.cpp" />
     <ClCompile Include="Asteroid.cpp" />
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="GameLevel.cpp" />
-    <ClCompile Include="GameObject.cpp" />
     <ClCompile Include="GameOverScreen.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MyButton.cpp" />

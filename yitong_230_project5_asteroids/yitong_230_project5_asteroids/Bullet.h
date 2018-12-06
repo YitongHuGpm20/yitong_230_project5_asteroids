@@ -6,10 +6,11 @@
 #include <SFML/System.hpp>
 #include <SFML/OpenGL.hpp>
 #include <SFML/Main.hpp>
+#include "GameObject.h"
 
 using namespace sf;
 
-class Bullet
+class Bullet : public GameObject
 {
 public:
 	float speed = 600;
@@ -19,5 +20,9 @@ public:
 	Vector2f vel = Vector2f(0, 0);
 
 	RectangleShape DrawBullet();
+	virtual void update(float dt);
+	virtual void draw();
+	virtual Vector2f getCenter();
+	virtual void checkCollisionWith(GameObject * obj);
 };
 
