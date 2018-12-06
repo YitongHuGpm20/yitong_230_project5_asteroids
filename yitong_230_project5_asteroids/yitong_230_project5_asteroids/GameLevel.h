@@ -34,10 +34,13 @@ private:
 	vector<GameObject*> grid[COLUMNS][ROWS];
 	
 public:
+	vector<GameObject*> &boomGrid = grid[0][0];
+
 	GameLevel(int level);
 	virtual AppState* update_state(float dt);
 	virtual void render_frame();
 	void addGameObject(GameObject* obj);
+	void deleteGameObject(vector<GameObject*> &v, int i);
 	void bucket_add(Vector2i b, GameObject* obj);
 	void bucket_remove(Vector2i b, GameObject* obj);
 	void detect_collisions(GameObject* obj, Vector2i b);

@@ -1,7 +1,14 @@
 #include "Bullet.h"
+#include <cmath>
 
 extern Ship* s;
 extern RenderWindow window;
+extern bool boom;
+extern Vector2f boomPos;
+float length(Vector2f v) {
+	return sqrtf(v.x*v.x + v.y*v.y);
+}
+
 
 void Bullet::update(float dt)
 {
@@ -35,7 +42,13 @@ Vector2f Bullet::getCenter()
 
 void Bullet::checkCollisionWith(GameObject * obj)
 {
-
+	float dis = length(this->getCenter() - obj->getCenter());
+	if (dis <= this->getRadius() + obj->getRadius() && obj->getName() == "asteroid") {
+		pos = Vector2f(-100, -100);
+		boom = true;
+		boomPos = obj->getCenter();
+		obj->getCenter() = Vector2f(-100, -100);
+	}
 }
 
 string Bullet::getName()

@@ -3,6 +3,9 @@
 extern RenderWindow window;
 
 Ship* s = new Ship();
+bool boom = false;
+Vector2f boomPos;
+int co1, co2;
 
 GameLevel::GameLevel(int level) {
 	//setup ship
@@ -67,6 +70,21 @@ void GameLevel::detect_collisions(GameObject* obj, Vector2i b) {
 			for (GameObject* o : v) {
 				if (o != obj)
 					obj->checkCollisionWith(o);
+				if (boom) {
+					for (int i = 0; i < v.size(); ++i) {
+						if (v[i] == obj) {
+							co1 = i;
+							break;
+						}	
+					}
+					for (int i = 0; i < v.size(); ++i) {
+						if (v[i] == o) {
+							co2 = i;
+							break;
+						}
+					}
+					boomGrid = v;
+				}
 			}
 		}
 	}
@@ -76,6 +94,11 @@ void GameLevel::addGameObject(GameObject* obj)
 {
 	objects.push_back(obj);
 	bucket_add(getBucket(obj->getCenter()), obj);
+}
+
+void GameLevel::deleteGameObject(vector<GameObject*> &v, int i) {
+	bucket_remove(getBucket(v[i]->getCenter()), v[i]);
+	objects.erase(objects.begin() + i);
 }
 
 AppState* GameLevel::update_state(float dt) {	
@@ -90,6 +113,33 @@ AppState* GameLevel::update_state(float dt) {
 			bucket_add(newBucket, obj);
 		}
 		detect_collisions(obj, newBucket);
+	}
+
+	//check if shot an asteroid
+	if (boom) {
+		Asteroid* a1 = new Asteroid();
+		a1->tex.loadFromFile("asteroid.png");
+		float angle1 = rand() % 360;
+		a1->vel.x = cos((angle1 * 3.1415926f) / 180);
+		a1->vel.y = sin((angle1 * 3.1415926f) / 180);
+		a1->radius = a1->radius / 2;
+		a1->health--;
+		a1->pos.x = boomPos.x + rand() % 100;
+		a1->pos.y = boomPos.y + rand() % 100 - 50;
+		addGameObject(a1);
+		Asteroid* a2 = new Asteroid();
+		a2->tex.loadFromFile("asteroid.png");
+		float angle2 = rand() % 360;
+		a2->vel.x = cos((angle2 * 3.1415926f) / 180);
+		a2->vel.y = sin((angle2 * 3.1415926f) / 180);
+		a2->radius = a2->radius / 2;
+		a2->health--;
+		a2->pos.x = boomPos.x + rand() % 100;
+		a2->pos.y = boomPos.y + rand() % 100 - 50;
+		addGameObject(a2);
+		deleteGameObject(boomGrid, co1);
+		deleteGameObject(boomGrid, co2);
+		boom = false;
 	}
 
 	//switch scenes

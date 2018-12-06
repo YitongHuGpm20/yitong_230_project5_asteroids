@@ -19,6 +19,7 @@ public:
 	float speed = 50;
 	float rot;
 	Texture tex;
+	int health = 2;
 
 	virtual void update(float dt);
 	virtual void draw();
