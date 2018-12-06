@@ -1,18 +1,4 @@
 #include "GameLevel.h"
-#include "MainMenu.h"
-#include "GameOverScreen.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/Audio.hpp>
-#include <SFML/Network.hpp>
-#include <SFML/System.hpp>
-#include <SFML/OpenGL.hpp>
-#include <SFML/Main.hpp>
-#include "AppState.h"
-#include <vector>
-#include <memory>
-
-using namespace sf;
 
 template<typename T>
 T lerp(T start, T end, float t) {
@@ -49,7 +35,7 @@ GameLevel::GameLevel(int level)
 }
 
 AppState* GameLevel::update_state(float dt)
-{
+{	
 	for (int i = 0; i < objs.size(); ++i)
 		objs[i]->update(dt);
 	//if (lives <= 0)
@@ -145,6 +131,9 @@ AppState* GameLevel::update_state(float dt)
 		asteroid[i].pos.x += asteroid[i].vel.x * dt * asteroid[i].speed;
 		asteroid[i].pos.y += asteroid[i].vel.y * dt * asteroid[i].speed;
 	}
+
+	if (count < 300)
+		count++;
 
 	return nullptr;
 }

@@ -12,6 +12,7 @@
 #include "Bullet.h"
 #include "AppState.h"
 #include "Asteroid.h"
+#include "MainMenu.h"
 #include <vector>
 #include <memory>
 
@@ -24,7 +25,7 @@ private:
 	int level;
 	vector<unique_ptr<GameObject>> objs;
 	int lives;
-	int enemiesRemaining;
+	int enemiesRemaining = 4 + level - 1;
 	Ship ship;
 	Texture tex_ship;
 	SoundBuffer buf_ship;
@@ -34,7 +35,6 @@ private:
 	Sound sou_bullet;
 	Asteroid asteroid[10];
 	Texture tex_ast;
-	
 	float green = 255;
 	float red = 200;
 	float blue = 0;

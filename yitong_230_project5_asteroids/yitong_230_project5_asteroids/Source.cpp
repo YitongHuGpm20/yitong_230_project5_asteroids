@@ -18,6 +18,7 @@
 using namespace sf;
 
 RenderWindow window;
+int count = 300;
 
 int main()
 {
@@ -41,6 +42,7 @@ int main()
 		AppState* next = curState->update_state(dt);
 		curState->render_frame();
 		window.display();
+		
 
 		if (next != nullptr)
 			curState.reset(next);
