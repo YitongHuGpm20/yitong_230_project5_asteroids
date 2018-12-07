@@ -19,8 +19,8 @@ int enemiesRemaining = 4 + level - 1;
 Texture tex_ship;
 
 GameLevel::GameLevel(int level) {
-	buf_ast.loadFromFile("boom_asteroid.wav");
-	sou_ast.setBuffer(buf_ast);
+	//buf_ast.loadFromFile("boom_asteroid.wav");
+	//sou_ast.setBuffer(buf_ast);
 	for (int i = 0; i < 10; i++)
 		lives[i].loc.x = 10 + lives[i].space * i;
 	tex_ship.loadFromFile("spaceship.png");
@@ -38,9 +38,9 @@ GameLevel::GameLevel(int level) {
 	for (int i = 0; i < 4; i++) {
 		Asteroid* a = new Asteroid();
 		a->tex.loadFromFile("asteroid.png");
-		float angle = rand() % 360;
-		a->vel.x = cos((angle * 3.1415926f) / 180);
-		a->vel.y = sin((angle * 3.1415926f) / 180);
+		a->rot = rand() % 360;
+		a->vel.x = cos((a->rot * 3.1415926f) / 180);
+		a->vel.y = sin((a->rot * 3.1415926f) / 180);
 		do {
 			a->pos.x = rand() % 1000 + 100;
 			a->pos.y = rand() % 800 + 50;
@@ -129,7 +129,7 @@ AppState* GameLevel::update_state(float dt) {
 
 	//check if shot an asteroid
 	if (boom) {
-		sou_ast.play();
+		//sou_ast.play();
 		if (!isSma) {
 			Asteroid* a1 = new Asteroid();
 			a1->tex.loadFromFile("asteroid.png");
@@ -163,6 +163,7 @@ AppState* GameLevel::update_state(float dt) {
 			a2->pos.x = boomPos.x + rand() % 100;
 			a2->pos.y = boomPos.y + rand() % 100 - 50;
 			addGameObject(a2);
+			enemiesRemaining += 2;
 		}
 		boom = false;
 		isBig = true;

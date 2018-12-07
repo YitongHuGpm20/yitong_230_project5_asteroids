@@ -12,8 +12,7 @@ T easeOut(T start, T end, float t) {
 	return start + (end - start) * (t * t * t + 1);
 }
 
-void Asteroid::update(float dt)
-{
+void Asteroid::update(float dt){
 	if (pos.x <= -radius * 2)
 		pos.x = window.getSize().x;
 	if (pos.x >= window.getSize().x + radius * 2)
@@ -37,8 +36,7 @@ void Asteroid::update(float dt)
 	blue = easeOut(blue, 255.f, dt);
 }
 
-void Asteroid::draw()
-{
+void Asteroid::draw(){
 	CircleShape shape;
 	shape.setPosition(pos);
 	shape.setRadius(radius);
@@ -49,27 +47,32 @@ void Asteroid::draw()
 	window.draw(shape);
 }
 
-Vector2f Asteroid::getCenter()
-{
+Vector2f Asteroid::getCenter(){
 	return pos;
 }
 
-void Asteroid::checkCollisionWith(GameObject * obj)
-{
-	//check collid with bullets
+void Asteroid::checkCollisionWith(GameObject * obj){
+	float dis = length(this->getCenter() - obj->getCenter());
+	if (dis <= this->getRadius() + obj->getRadius() && obj->getName() == "asteroid") {
+		if (this->getCenter().x <= obj->getCenter().x) {
+			rot = rand() % 180 + 90;
+		}
+		else
+			rot = rand() % 180 - 90;
+		
+		vel.x = cos((rot * 3.1415926f) / 180);
+		vel.y = sin((rot * 3.1415926f) / 180);
+	}
 }
 
-string Asteroid::getName()
-{
+string Asteroid::getName(){
 	return "asteroid";
 }
 
-float Asteroid::getRadius()
-{
+float Asteroid::getRadius(){
 	return radius;
 }
 
-bool Asteroid::isDead()
-{
+bool Asteroid::isDead(){
 	return reallyDead;
 }
