@@ -10,8 +10,6 @@ int co1, co2;
 bool isBig = true;
 bool isMid = false;
 bool isSma = false;
-SoundBuffer buf_ast;
-Sound sou_ast;
 bool shipDead = false;
 Lives lives[3];
 int livesLeft = 3;
@@ -26,8 +24,6 @@ string printLevel;
 int levelDone[10];
 Text txt_lv;
 Text txt_next;
-SoundBuffer buf_win;
-Sound sou_win;
 
 template <typename T>
 string toString(T arg) {
@@ -37,16 +33,16 @@ string toString(T arg) {
 }
 
 GameLevel::GameLevel(int level) {
-	//buf_ast.loadFromFile("boom_asteroid.wav");
-	//sou_ast.setBuffer(buf_ast);
+	buf_ast.loadFromFile("boom_asteroid.wav");
+	sou_ast.setBuffer(buf_ast);
 	for (int i = 0; i < 10; i++)
 		lives[i].loc.x = 10 + lives[i].space * i;
 	tex_ship.loadFromFile("spaceship.png");
 	levelDone[0] = 1600;
 	for (int i = 1; i < 10; i++)
 		levelDone[i] = levelDone[i - 1] + 1600 + i * 400;
-	//buf_win.loadFromFile("win.wav");
-	//sou_win.setBuffer(buf_win);
+	buf_win.loadFromFile("win.wav");
+	sou_win.setBuffer(buf_win);
 	livesLeft = 3;
 	
 	//set score

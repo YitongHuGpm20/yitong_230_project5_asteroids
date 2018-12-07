@@ -36,6 +36,10 @@ private:
 	
 public:
 	vector<GameObject*> &boomGrid = grid[0][0];
+	SoundBuffer buf_ast;
+	Sound sou_ast;
+	SoundBuffer buf_win;
+	Sound sou_win;
 
 	GameLevel(int level);
 	virtual AppState* update_state(float dt);
