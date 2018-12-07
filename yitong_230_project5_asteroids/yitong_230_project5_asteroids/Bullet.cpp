@@ -9,6 +9,7 @@ extern bool isBig;
 extern bool isMid;
 extern bool isSma;
 extern int enemiesRemaining;
+extern int score;
 
 void Bullet::update(float dt) {
 	if (pos.x <= -size.x)
@@ -54,6 +55,7 @@ void Bullet::checkCollisionWith(GameObject * obj) {
 			isMid = false;
 			isSma = true;
 			enemiesRemaining--;
+			score += 100;
 		}
 	}
 }

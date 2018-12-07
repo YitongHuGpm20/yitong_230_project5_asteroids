@@ -16,6 +16,8 @@
 #include "Lives.h"
 #include <vector>
 #include <memory>
+#include <string>
+#include <sstream>
 
 using namespace sf;
 using namespace std;

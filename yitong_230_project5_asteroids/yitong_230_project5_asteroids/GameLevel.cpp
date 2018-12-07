@@ -1,6 +1,7 @@
 #include "GameLevel.h"
 
 extern RenderWindow window;
+extern Font font;
 
 Ship* s = new Ship();
 bool boom = false;
@@ -17,6 +18,16 @@ int livesLeft = 3;
 int level = 1;
 int enemiesRemaining = 4 + level - 1;
 Texture tex_ship;
+int score = 0;
+Text txt_score;
+string printScore;
+
+template <typename T>
+string toString(T arg) {
+	stringstream ss;
+	ss << arg;
+	return ss.str();
+}
 
 GameLevel::GameLevel(int level) {
 	//buf_ast.loadFromFile("boom_asteroid.wav");
@@ -24,6 +35,14 @@ GameLevel::GameLevel(int level) {
 	for (int i = 0; i < 10; i++)
 		lives[i].loc.x = 10 + lives[i].space * i;
 	tex_ship.loadFromFile("spaceship.png");
+	
+	//set score
+	txt_score.setFont(font);
+	txt_score.setCharacterSize(12);
+	txt_score.setString("SCORE: 0");
+	txt_score.setPosition(900, 100);
+	txt_score.setFillColor(Color::Green);
+	txt_score.setStyle(Text::Bold);
 	
 	//setup ship
 	s->tex.loadFromFile("spaceship.png");
@@ -218,8 +237,12 @@ AppState* GameLevel::update_state(float dt) {
 }
 
 void GameLevel::render_frame() {
+	txt_score.setString(printScore);
+	window.draw(txt_score);
 	for (int i = 0; i < objects.size(); ++i)
 		objects[i]->draw();
 	for (int i = 0; i < livesLeft; i++)
 		window.draw(lives[i].DrawLives(tex_ship));
+	printScore = "SCORE: " + toString<int>(score);
+	
 }
