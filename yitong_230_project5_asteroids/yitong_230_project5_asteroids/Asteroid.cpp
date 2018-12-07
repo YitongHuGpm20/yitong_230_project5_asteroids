@@ -43,7 +43,7 @@ void Asteroid::draw()
 	shape.setPosition(pos);
 	shape.setRadius(radius);
 	shape.setTexture(&tex);
-	shape.setOrigin(radius / 2, radius / 2);
+	shape.setOrigin(radius, radius);
 	shape.setRotation(rot);
 	shape.setFillColor(Color(255, green, blue));
 	window.draw(shape);

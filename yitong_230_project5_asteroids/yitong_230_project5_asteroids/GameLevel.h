@@ -13,6 +13,7 @@
 #include "AppState.h"
 #include "Asteroid.h"
 #include "MainMenu.h"
+#include "Lives.h"
 #include <vector>
 #include <memory>
 
@@ -27,9 +28,6 @@ const int ROWS = 10;
 class GameLevel : public AppState
 {
 private:
-	int level;
-	int lives;
-	int enemiesRemaining = 4 + level - 1;
 	vector<GameObject*> objects;
 	vector<GameObject*> grid[COLUMNS][ROWS];
 	

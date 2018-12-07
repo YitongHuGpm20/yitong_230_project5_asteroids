@@ -21,10 +21,13 @@ public:
 	Texture tex;
 	SoundBuffer buf;
 	Sound sou;
+	SoundBuffer buf_dead;
+	Sound sou_dead;
 	float green = 255;
 	float red = 200;
 	float blue = 0;
 	int count = 300;
+	int dieCount = 0;
 
 	virtual void update(float dt);
 	virtual void draw();

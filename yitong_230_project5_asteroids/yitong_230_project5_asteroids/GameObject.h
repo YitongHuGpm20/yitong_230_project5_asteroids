@@ -15,6 +15,9 @@ class GameObject
 {
 public:
 	bool reallyDead = false;
+	float length(Vector2f v) {
+		return sqrtf(v.x*v.x + v.y*v.y);
+	}
 
 	virtual void update(float dt) = 0;
 	virtual void draw() = 0;

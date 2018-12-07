@@ -11,36 +11,38 @@ T easeOut(T start, T end, float t) {
 }
 
 extern RenderWindow window;
+extern bool shipDead;
 
-void Ship::update(float dt)
-{
+void Ship::update(float dt) {
 	//player control
-	if (Keyboard::isKeyPressed(Keyboard::Left))
-		rot += -0.5f;
-	if (Keyboard::isKeyPressed(Keyboard::Right))
-		rot += 0.5f;
-	if (Keyboard::isKeyPressed(Keyboard::Up)) {
-		vel.x += cos(((rot - 90) * 3.1415926f) / 180) * dt;
-		vel.y += sin(((rot - 90) * 3.1415926f) / 180) * dt;
-		red = 255;
-		blue = 255;
-		if (sou.getStatus() != Sound::Playing)
-			sou.play();
-	}
-	if (Keyboard::isKeyPressed(Keyboard::Down)) {
-		vel.x -= cos(((rot - 90) * 3.1415926f) / 180) * dt;
-		vel.y -= sin(((rot - 90) * 3.1415926f) / 180) * dt;
-		red = 255;
-		blue = 255;
-		if (sou.getStatus() != Sound::Playing)
-			sou.play();
+	if (!shipDead) {
+		if (Keyboard::isKeyPressed(Keyboard::Left))
+			rot += -0.5f;
+		if (Keyboard::isKeyPressed(Keyboard::Right))
+			rot += 0.5f;
+		if (Keyboard::isKeyPressed(Keyboard::Up)) {
+			vel.x += cos(((rot - 90) * 3.1415926f) / 180) * dt;
+			vel.y += sin(((rot - 90) * 3.1415926f) / 180) * dt;
+			red = 255;
+			blue = 255;
+			if (sou.getStatus() != Sound::Playing)
+				sou.play();
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Down)) {
+			vel.x -= cos(((rot - 90) * 3.1415926f) / 180) * dt;
+			vel.y -= sin(((rot - 90) * 3.1415926f) / 180) * dt;
+			red = 255;
+			blue = 255;
+			if (sou.getStatus() != Sound::Playing)
+				sou.play();
+		}
 	}
 	
 	//slow down
 	vel.x = lerp(vel.x, 0.f, dt);
 	vel.y = lerp(vel.y, 0.f, dt);
 
-	//speed up
+	//lights up when launching
 	red = easeOut(red, 200.f, dt);
 	blue = easeOut(blue, 0.f, dt);
 
@@ -58,12 +60,16 @@ void Ship::update(float dt)
 	pos.x += vel.x * dt * speed;
 	pos.y += vel.y * dt * speed;
 
+	//bullet cool down
 	if (count < 300)
 		count++;
+
+	//display boom for a few seconds
+	if (shipDead)
+		dieCount++;
 }
 
-void Ship::draw()
-{
+void Ship::draw() {
 	RectangleShape shape;
 	shape.setPosition(pos);
 	shape.setSize(size);
@@ -74,27 +80,27 @@ void Ship::draw()
 	window.draw(shape);
 }
 
-Vector2f Ship::getCenter()
-{
+Vector2f Ship::getCenter() {
 	return pos;
 }
 
-void Ship::checkCollisionWith(GameObject * obj)
-{
-	//collide with asteroids and destroyed
+void Ship::checkCollisionWith(GameObject * obj) {
+	float dis = length(this->getCenter() - obj->getCenter());
+	if (dis <= this->getRadius() + obj->getRadius() && obj->getName() == "asteroid") {
+		shipDead = true;
+		if (sou_dead.getStatus() != Sound::Playing)
+			sou_dead.play();
+	}
 }
 
-string Ship::getName()
-{
+string Ship::getName() {
 	return "ship";
 }
 
-float Ship::getRadius()
-{
+float Ship::getRadius() {
 	return 20.f;
 }
 
-bool Ship::isDead()
-{
+bool Ship::isDead() {
 	return reallyDead;
 }

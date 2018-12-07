@@ -11,15 +11,26 @@ bool isMid = false;
 bool isSma = false;
 SoundBuffer buf_ast;
 Sound sou_ast;
+bool shipDead = false;
+Lives lives[3];
+int livesLeft = 3;
+int level = 1;
+int enemiesRemaining = 4 + level - 1;
+Texture tex_ship;
 
 GameLevel::GameLevel(int level) {
 	buf_ast.loadFromFile("boom_asteroid.wav");
 	sou_ast.setBuffer(buf_ast);
+	for (int i = 0; i < 10; i++)
+		lives[i].loc.x = 10 + lives[i].space * i;
+	tex_ship.loadFromFile("spaceship.png");
 	
 	//setup ship
 	s->tex.loadFromFile("spaceship.png");
 	s->buf.loadFromFile("launch.wav");
 	s->sou.setBuffer(s->buf);
+	s->buf_dead.loadFromFile("shipdie.wav");
+	s->sou_dead.setBuffer(s->buf_dead);
 	s->sou.setVolume(50);
 	addGameObject(s);
 
@@ -159,14 +170,33 @@ AppState* GameLevel::update_state(float dt) {
 		isSma = false;
 	}
 
+	//check if ship has been destroyed
+	if (shipDead) {
+		s->tex.loadFromFile("shipdie.png");
+		s->size = Vector2f(100, 80);
+		s->rot = 0;
+		s->vel = Vector2f(0, 0);
+		if (s->dieCount >= 750) {
+			shipDead = false;
+			livesLeft--;
+			s->dieCount = 0;
+			s->tex.loadFromFile("spaceship.png");
+			s->size = Vector2f(40, 60);
+			s->rot = 0;
+			s->vel = Vector2f(0, 0);
+			s->pos = Vector2f(600 - 20, 450 - 30);
+		}
+	}
+
 	//switch scenes
-	//if (lives <= 0)
+	//if (livesLeft <= 0)
 		//return new GameOverScreen();
 	if (enemiesRemaining <= 0)
 		return new GameLevel(level + 1);
 	if (Keyboard::isKeyPressed(Keyboard::Escape))
 		return new MainMenu();
 
+	//fire bullet
 	if (Keyboard::isKeyPressed(Keyboard::Space)) {
 		if (s->count == 300) {
 			Bullet* b = new Bullet();
@@ -189,4 +219,6 @@ AppState* GameLevel::update_state(float dt) {
 void GameLevel::render_frame() {
 	for (int i = 0; i < objects.size(); ++i)
 		objects[i]->draw();
+	for (int i = 0; i < livesLeft; i++)
+		window.draw(lives[i].DrawLives(tex_ship));
 }

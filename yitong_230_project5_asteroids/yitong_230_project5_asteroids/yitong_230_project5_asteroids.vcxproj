@@ -153,6 +153,7 @@
     <ClCompile Include="Bullet.cpp" />
     <ClCompile Include="GameLevel.cpp" />
     <ClCompile Include="GameOverScreen.cpp" />
+    <ClCompile Include="Lives.cpp" />
     <ClCompile Include="MainMenu.cpp" />
     <ClCompile Include="MyButton.cpp" />
     <ClCompile Include="Ship.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="GameLevel.h" />
     <ClInclude Include="GameObject.h" />
     <ClInclude Include="GameOverScreen.h" />
+    <ClInclude Include="Lives.h" />
     <ClInclude Include="MainMenu.h" />
     <ClInclude Include="MyButton.h" />
     <ClInclude Include="Ship.h" />

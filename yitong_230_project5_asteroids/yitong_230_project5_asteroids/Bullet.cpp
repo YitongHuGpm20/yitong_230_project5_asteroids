@@ -8,9 +8,7 @@ extern Vector2f boomPos;
 extern bool isBig;
 extern bool isMid;
 extern bool isSma;
-float length(Vector2f v) {
-	return sqrtf(v.x*v.x + v.y*v.y);
-}
+extern int enemiesRemaining;
 
 void Bullet::update(float dt) {
 	if (pos.x <= -size.x)
@@ -55,6 +53,7 @@ void Bullet::checkCollisionWith(GameObject * obj) {
 			isBig = false;
 			isMid = false;
 			isSma = true;
+			enemiesRemaining--;
 		}
 	}
 }
