@@ -14,6 +14,7 @@
 #include "Asteroid.h"
 #include "MainMenu.h"
 #include "Lives.h"
+#include "GameOverScreen.h"
 #include <vector>
 #include <memory>
 #include <string>

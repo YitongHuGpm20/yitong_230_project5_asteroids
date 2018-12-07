@@ -20,7 +20,14 @@ int enemiesRemaining = 4 + level - 1;
 Texture tex_ship;
 int score = 0;
 Text txt_score;
+Text txt_level;
 string printScore;
+string printLevel;
+int levelDone[10];
+Text txt_lv;
+Text txt_next;
+SoundBuffer buf_win;
+Sound sou_win;
 
 template <typename T>
 string toString(T arg) {
@@ -35,14 +42,31 @@ GameLevel::GameLevel(int level) {
 	for (int i = 0; i < 10; i++)
 		lives[i].loc.x = 10 + lives[i].space * i;
 	tex_ship.loadFromFile("spaceship.png");
+	levelDone[0] = 1600;
+	for (int i = 1; i < 10; i++)
+		levelDone[i] = levelDone[i - 1] + 1600 + i * 400;
+	//buf_win.loadFromFile("win.wav");
+	//sou_win.setBuffer(buf_win);
+	livesLeft = 3;
 	
 	//set score
 	txt_score.setFont(font);
-	txt_score.setCharacterSize(12);
+	txt_score.setCharacterSize(24);
 	txt_score.setString("SCORE: 0");
-	txt_score.setPosition(900, 100);
+	txt_score.setPosition(900, 50);
 	txt_score.setFillColor(Color::Green);
 	txt_score.setStyle(Text::Bold);
+	txt_score.setScale(1.f, 1.f);
+	txt_score.setRotation(0);
+
+	//set level
+	txt_level.setFont(font);
+	txt_level.setCharacterSize(24);
+	txt_level.setString("LEVEL: 1");
+	txt_level.setPosition(50, 50);
+	txt_level.setFillColor(Color::Green);
+	txt_level.setStyle(Text::Bold);
+	txt_level.setScale(1.f, 1.f);
 	
 	//setup ship
 	s->tex.loadFromFile("spaceship.png");
@@ -53,13 +77,26 @@ GameLevel::GameLevel(int level) {
 	s->sou.setVolume(50);
 	addGameObject(s);
 
+	//level done messages
+	txt_lv.setFont(font);
+	txt_lv.setCharacterSize(24);
+	txt_lv.setPosition(10, 10);
+	txt_lv.setFillColor(Color::Yellow);
+	txt_lv.setString("You finished one level!");
+	txt_next.setFont(font);
+	txt_next.setCharacterSize(24);
+	txt_next.setPosition(10, 60);
+	txt_next.setFillColor(Color::Yellow);
+	txt_next.setString("Press Enter to continue...");
+
 	//setup asteroids
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < level + 3; i++) {
 		Asteroid* a = new Asteroid();
 		a->tex.loadFromFile("asteroid.png");
 		a->rot = rand() % 360;
 		a->vel.x = cos((a->rot * 3.1415926f) / 180);
 		a->vel.y = sin((a->rot * 3.1415926f) / 180);
+		a->speed += (level - 1) * 10;
 		do {
 			a->pos.x = rand() % 1000 + 100;
 			a->pos.y = rand() % 800 + 50;
@@ -148,7 +185,7 @@ AppState* GameLevel::update_state(float dt) {
 
 	//check if shot an asteroid
 	if (boom) {
-		//sou_ast.play();
+		sou_ast.play();
 		if (!isSma) {
 			Asteroid* a1 = new Asteroid();
 			a1->tex.loadFromFile("asteroid.png");
@@ -157,11 +194,11 @@ AppState* GameLevel::update_state(float dt) {
 			a1->vel.y = sin((angle1 * 3.1415926f) / 180);
 			if (isBig && !isMid) {
 				a1->radius = 35;
-				a1->speed = 50;
+				a1->speed = 50 + (level - 1) * 10;
 			}
 			else if (!isBig && isMid) {
 				a1->radius = 17.5;
-				a1->speed = 75;
+				a1->speed = 75 + (level - 1) * 10;
 			}
 			a1->pos.x = boomPos.x + rand() % 100;
 			a1->pos.y = boomPos.y + rand() % 100 - 50;
@@ -173,11 +210,11 @@ AppState* GameLevel::update_state(float dt) {
 			a2->vel.y = sin((angle2 * 3.1415926f) / 180);
 			if (isBig && !isMid) {
 				a2->radius = 35;
-				a2->speed = 50;
+				a2->speed = 50 + (level - 1) * 10;
 			}	
 			else if (!isBig && isMid) {
 				a2->radius = 17.5;
-				a2->speed = 75;
+				a2->speed = 75 + (level - 1) * 10;
 			}
 			a2->pos.x = boomPos.x + rand() % 100;
 			a2->pos.y = boomPos.y + rand() % 100 - 50;
@@ -209,10 +246,29 @@ AppState* GameLevel::update_state(float dt) {
 	}
 
 	//switch scenes
-	//if (livesLeft <= 0)
-		//return new GameOverScreen();
-	if (enemiesRemaining <= 0)
-		return new GameLevel(level + 1);
+	if (livesLeft <= 0)
+		return new GameOverScreen();
+	for (int i = level - 1 ; i < 10; i++) {
+		if (score == levelDone[i]) {
+			level++;
+			s->pos = Vector2f(600 - 20, 450 - 30);
+			RenderWindow levelFinish(VideoMode(400, 100), "Level Complete!");
+			while (levelFinish.isOpen()) {
+				Event event;
+				while (levelFinish.pollEvent(event)) {
+					if (Keyboard::isKeyPressed(Keyboard::Enter)) {
+						levelFinish.close();
+					}
+				}
+				levelFinish.clear();
+				levelFinish.draw(txt_lv);
+				levelFinish.draw(txt_next);
+				levelFinish.display();
+			}
+			sou_win.play();
+			return new GameLevel(level);
+		}	
+	}
 	if (Keyboard::isKeyPressed(Keyboard::Escape))
 		return new MainMenu();
 
@@ -237,12 +293,14 @@ AppState* GameLevel::update_state(float dt) {
 }
 
 void GameLevel::render_frame() {
-	txt_score.setString(printScore);
-	window.draw(txt_score);
 	for (int i = 0; i < objects.size(); ++i)
 		objects[i]->draw();
 	for (int i = 0; i < livesLeft; i++)
 		window.draw(lives[i].DrawLives(tex_ship));
 	printScore = "SCORE: " + toString<int>(score);
-	
+	txt_score.setString(printScore);
+	window.draw(txt_score);
+	printLevel = "LEVEL: " + toString<int>(level);
+	txt_level.setString(printLevel);
+	window.draw(txt_level);
 }

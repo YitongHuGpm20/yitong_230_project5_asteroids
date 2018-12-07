@@ -1,6 +1,7 @@
 #include "Asteroid.h"
 
 extern RenderWindow window;
+extern int level;
 
 template<typename T>
 T lerp(T start, T end, float t) {
@@ -24,13 +25,13 @@ void Asteroid::update(float dt){
 	pos.x += vel.x * dt * speed;
 	pos.y += vel.y * dt * speed;
 	if (this->getRadius() == 70) {
-		speed = lerp(speed, 75.f, dt);
+		speed = lerp(speed, 75.f + (level - 1) * 10, dt);
 	}
 	else if (this->getRadius() == 35) {
-		speed = lerp(speed, 100.f, dt);
+		speed = lerp(speed, 100.f + (level - 1) * 10, dt);
 	}
 	else if (this->getRadius() == 17.5) {
-		speed = lerp(speed, 125.f, dt);
+		speed = lerp(speed, 125.f + (level - 1) * 10, dt);
 	}
 	green = easeOut(green, 255.f, dt);
 	blue = easeOut(blue, 255.f, dt);

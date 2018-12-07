@@ -42,7 +42,6 @@ int main()
 		AppState* next = curState->update_state(dt);
 		curState->render_frame();
 		window.display();
-		
 
 		if (next != nullptr)
 			curState.reset(next);
