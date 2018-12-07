@@ -40,7 +40,7 @@ public:
 	virtual AppState* update_state(float dt);
 	virtual void render_frame();
 	void addGameObject(GameObject* obj);
-	void deleteGameObject(vector<GameObject*> &v, int i);
+	void deleteGameObject(GameObject* obj, int i);
 	void bucket_add(Vector2i b, GameObject* obj);
 	void bucket_remove(Vector2i b, GameObject* obj);
 	void detect_collisions(GameObject* obj, Vector2i b);

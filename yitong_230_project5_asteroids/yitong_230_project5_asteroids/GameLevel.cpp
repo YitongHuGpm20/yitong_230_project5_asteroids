@@ -6,8 +6,16 @@ Ship* s = new Ship();
 bool boom = false;
 Vector2f boomPos;
 int co1, co2;
+bool isBig = true;
+bool isMid = false;
+bool isSma = false;
+SoundBuffer buf_ast;
+Sound sou_ast;
 
 GameLevel::GameLevel(int level) {
+	buf_ast.loadFromFile("boom_asteroid.wav");
+	sou_ast.setBuffer(buf_ast);
+	
 	//setup ship
 	s->tex.loadFromFile("spaceship.png");
 	s->buf.loadFromFile("launch.wav");
@@ -70,21 +78,6 @@ void GameLevel::detect_collisions(GameObject* obj, Vector2i b) {
 			for (GameObject* o : v) {
 				if (o != obj)
 					obj->checkCollisionWith(o);
-				if (boom) {
-					for (int i = 0; i < v.size(); ++i) {
-						if (v[i] == obj) {
-							co1 = i;
-							break;
-						}	
-					}
-					for (int i = 0; i < v.size(); ++i) {
-						if (v[i] == o) {
-							co2 = i;
-							break;
-						}
-					}
-					boomGrid = v;
-				}
 			}
 		}
 	}
@@ -96,8 +89,8 @@ void GameLevel::addGameObject(GameObject* obj)
 	bucket_add(getBucket(obj->getCenter()), obj);
 }
 
-void GameLevel::deleteGameObject(vector<GameObject*> &v, int i) {
-	bucket_remove(getBucket(v[i]->getCenter()), v[i]);
+void GameLevel::deleteGameObject(GameObject* obj, int i) {
+	bucket_remove(getBucket(obj->getCenter()), obj);
 	objects.erase(objects.begin() + i);
 }
 
@@ -113,33 +106,57 @@ AppState* GameLevel::update_state(float dt) {
 			bucket_add(newBucket, obj);
 		}
 		detect_collisions(obj, newBucket);
+		if (obj->isDead()) {
+			for (int i = 0; i < objects.size(); ++i) {
+				if (objects[i] == obj) {
+					deleteGameObject(obj, i);
+					break;
+				}
+			}
+		}
 	}
 
 	//check if shot an asteroid
 	if (boom) {
-		Asteroid* a1 = new Asteroid();
-		a1->tex.loadFromFile("asteroid.png");
-		float angle1 = rand() % 360;
-		a1->vel.x = cos((angle1 * 3.1415926f) / 180);
-		a1->vel.y = sin((angle1 * 3.1415926f) / 180);
-		a1->radius = a1->radius / 2;
-		a1->health--;
-		a1->pos.x = boomPos.x + rand() % 100;
-		a1->pos.y = boomPos.y + rand() % 100 - 50;
-		addGameObject(a1);
-		Asteroid* a2 = new Asteroid();
-		a2->tex.loadFromFile("asteroid.png");
-		float angle2 = rand() % 360;
-		a2->vel.x = cos((angle2 * 3.1415926f) / 180);
-		a2->vel.y = sin((angle2 * 3.1415926f) / 180);
-		a2->radius = a2->radius / 2;
-		a2->health--;
-		a2->pos.x = boomPos.x + rand() % 100;
-		a2->pos.y = boomPos.y + rand() % 100 - 50;
-		addGameObject(a2);
-		deleteGameObject(boomGrid, co1);
-		deleteGameObject(boomGrid, co2);
+		sou_ast.play();
+		if (!isSma) {
+			Asteroid* a1 = new Asteroid();
+			a1->tex.loadFromFile("asteroid.png");
+			float angle1 = rand() % 360;
+			a1->vel.x = cos((angle1 * 3.1415926f) / 180);
+			a1->vel.y = sin((angle1 * 3.1415926f) / 180);
+			if (isBig && !isMid) {
+				a1->radius = 35;
+				a1->speed = 50;
+			}
+			else if (!isBig && isMid) {
+				a1->radius = 17.5;
+				a1->speed = 75;
+			}
+			a1->pos.x = boomPos.x + rand() % 100;
+			a1->pos.y = boomPos.y + rand() % 100 - 50;
+			addGameObject(a1);
+			Asteroid* a2 = new Asteroid();
+			a2->tex.loadFromFile("asteroid.png");
+			float angle2 = rand() % 360;
+			a2->vel.x = cos((angle2 * 3.1415926f) / 180);
+			a2->vel.y = sin((angle2 * 3.1415926f) / 180);
+			if (isBig && !isMid) {
+				a2->radius = 35;
+				a2->speed = 50;
+			}	
+			else if (!isBig && isMid) {
+				a2->radius = 17.5;
+				a2->speed = 75;
+			}
+			a2->pos.x = boomPos.x + rand() % 100;
+			a2->pos.y = boomPos.y + rand() % 100 - 50;
+			addGameObject(a2);
+		}
 		boom = false;
+		isBig = true;
+		isMid = false;
+		isSma = false;
 	}
 
 	//switch scenes

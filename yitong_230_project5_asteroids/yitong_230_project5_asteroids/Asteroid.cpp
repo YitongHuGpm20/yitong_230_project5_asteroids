@@ -2,6 +2,16 @@
 
 extern RenderWindow window;
 
+template<typename T>
+T lerp(T start, T end, float t) {
+	return start + (end - start) * t;
+}
+template<typename T>
+T easeOut(T start, T end, float t) {
+	--t;
+	return start + (end - start) * (t * t * t + 1);
+}
+
 void Asteroid::update(float dt)
 {
 	if (pos.x <= -radius * 2)
@@ -14,6 +24,17 @@ void Asteroid::update(float dt)
 		pos.y = 0;
 	pos.x += vel.x * dt * speed;
 	pos.y += vel.y * dt * speed;
+	if (this->getRadius() == 70) {
+		speed = lerp(speed, 75.f, dt);
+	}
+	else if (this->getRadius() == 35) {
+		speed = lerp(speed, 100.f, dt);
+	}
+	else if (this->getRadius() == 17.5) {
+		speed = lerp(speed, 125.f, dt);
+	}
+	green = easeOut(green, 255.f, dt);
+	blue = easeOut(blue, 255.f, dt);
 }
 
 void Asteroid::draw()
@@ -24,6 +45,7 @@ void Asteroid::draw()
 	shape.setTexture(&tex);
 	shape.setOrigin(radius / 2, radius / 2);
 	shape.setRotation(rot);
+	shape.setFillColor(Color(255, green, blue));
 	window.draw(shape);
 }
 
@@ -45,4 +67,9 @@ string Asteroid::getName()
 float Asteroid::getRadius()
 {
 	return radius;
+}
+
+bool Asteroid::isDead()
+{
+	return reallyDead;
 }

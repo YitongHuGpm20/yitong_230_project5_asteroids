@@ -28,5 +28,6 @@ public:
 	virtual void checkCollisionWith(GameObject * obj);
 	virtual string getName();
 	virtual float getRadius();
+	virtual bool isDead();
 };
 

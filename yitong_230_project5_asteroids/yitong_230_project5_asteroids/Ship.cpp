@@ -93,3 +93,8 @@ float Ship::getRadius()
 {
 	return 20.f;
 }
+
+bool Ship::isDead()
+{
+	return reallyDead;
+}

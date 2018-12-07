@@ -16,10 +16,11 @@ public:
 	Vector2f pos;
 	Vector2f vel;
 	float radius = 70;
-	float speed = 50;
+	float speed = 25;
 	float rot;
 	Texture tex;
-	int health = 2;
+	float green = 0;
+	float blue = 0;
 
 	virtual void update(float dt);
 	virtual void draw();
@@ -27,5 +28,6 @@ public:
 	virtual void checkCollisionWith(GameObject * obj);
 	virtual string getName();
 	virtual float getRadius();
+	virtual bool isDead();
 };
 
