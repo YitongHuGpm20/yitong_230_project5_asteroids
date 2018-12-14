@@ -17,9 +17,9 @@ void Ship::update(float dt) {
 	//player control
 	if (!shipDead) {
 		if (Keyboard::isKeyPressed(Keyboard::Left))
-			rot += -0.5f;
+			rot += -150.f * dt;
 		if (Keyboard::isKeyPressed(Keyboard::Right))
-			rot += 0.5f;
+			rot += 150.f * dt;
 		if (Keyboard::isKeyPressed(Keyboard::Up)) {
 			vel.x += cos(((rot - 90) * 3.1415926f) / 180) * dt;
 			vel.y += sin(((rot - 90) * 3.1415926f) / 180) * dt;
